@@ -52,8 +52,10 @@ func main() {
 	handler := api.NewHandler(engine)
 	handler.RegisterRoutes(mux)
 
+	port := envOrDefault("PORT", "8080")
+
 	server := &http.Server{
-		Addr:    ":9999",
+		Addr:    ":" + port,
 		Handler: mux,
 	}
 

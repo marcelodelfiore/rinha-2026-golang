@@ -1,0 +1,43 @@
+services:
+  api1:
+    build: .
+    hostname: api1
+    environment:
+      PORT: 8080
+      REFERENCES_PATH: resources/references.json.gz
+      NORMALIZATION_PATH: resources/normalization.json
+      MCC_RISK_PATH: resources/mcc_risk.json
+    deploy:
+      resources:
+        limits:
+          cpus: "0.45"
+          memory: "150MB"
+
+  api2:
+    build: .
+    hostname: api2
+    environment:
+      PORT: 8080
+      REFERENCES_PATH: resources/references.json.gz
+      NORMALIZATION_PATH: resources/normalization.json
+      MCC_RISK_PATH: resources/mcc_risk.json
+    deploy:
+      resources:
+        limits:
+          cpus: "0.45"
+          memory: "150MB"
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "9999:9999"
+    depends_on:
+      - api1
+      - api2
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: "50MB"
