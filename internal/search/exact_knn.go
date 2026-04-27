@@ -5,30 +5,33 @@ import (
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/vector"
 )
 
+const fixedK = 5
+
 type ExactKNN struct {
 	dataset *dataset.Dataset
 }
 
 func NewExactKNN(dataset *dataset.Dataset) *ExactKNN {
-	return &ExactKNN{
-		dataset: dataset,
-	}
+	return &ExactKNN{dataset: dataset}
 }
 
 func (s *ExactKNN) Search(query vector.Vector, k int) []Neighbor {
-	best := make([]Neighbor, 0, k)
+	var best [fixedK]Neighbor
+	count := 0
 
 	for i := 0; i < s.dataset.Count; i++ {
 		offset := s.dataset.VectorOffset(i)
 		distance := squaredEuclidean(query, s.dataset.Vectors[offset:offset+dataset.VectorDimensions])
 
-		insertNeighbor(&best, Neighbor{
+		candidate := Neighbor{
 			Distance: distance,
 			Fraud:    s.dataset.Labels[i],
-		}, k)
+		}
+
+		insertFixedNeighbor(&best, &count, candidate)
 	}
 
-	return best
+	return best[:count]
 }
 
 func squaredEuclidean(query vector.Vector, reference []float32) float32 {
@@ -42,34 +45,32 @@ func squaredEuclidean(query vector.Vector, reference []float32) float32 {
 	return sum
 }
 
-func insertNeighbor(best *[]Neighbor, candidate Neighbor, k int) {
-	neighbors := *best
-
-	if len(neighbors) < k {
-		neighbors = append(neighbors, candidate)
-		*best = neighbors
-		sortSmallNeighbors(*best)
+func insertFixedNeighbor(best *[fixedK]Neighbor, count *int, candidate Neighbor) {
+	if *count < fixedK {
+		best[*count] = candidate
+		*count++
+		sortFixedNeighbors(best, *count)
 		return
 	}
 
-	if candidate.Distance >= neighbors[k-1].Distance {
+	if candidate.Distance >= best[fixedK-1].Distance {
 		return
 	}
 
-	neighbors[k-1] = candidate
-	sortSmallNeighbors(neighbors)
+	best[fixedK-1] = candidate
+	sortFixedNeighbors(best, fixedK)
 }
 
-func sortSmallNeighbors(neighbors []Neighbor) {
-	for i := 1; i < len(neighbors); i++ {
-		current := neighbors[i]
+func sortFixedNeighbors(best *[fixedK]Neighbor, count int) {
+	for i := 1; i < count; i++ {
+		current := best[i]
 		j := i - 1
 
-		for j >= 0 && neighbors[j].Distance > current.Distance {
-			neighbors[j+1] = neighbors[j]
+		for j >= 0 && best[j].Distance > current.Distance {
+			best[j+1] = best[j]
 			j--
 		}
 
-		neighbors[j+1] = current
+		best[j+1] = current
 	}
 }
