@@ -1,0 +1,79 @@
+# =========================
+# Go build artifacts
+# =========================
+/bin/
+/build/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Go workspace
+go.work
+go.work.sum
+
+# =========================
+# Test & coverage
+# =========================
+*.out
+*.cover
+coverage.*
+cover.out
+
+# =========================
+# Profiling & performance
+# =========================
+cpu.out
+mem.out
+block.out
+mutex.out
+trace.out
+new.txt
+old.txt
+
+# pprof / flamegraph outputs
+*.pprof
+*.svg
+*.pdf
+*.html
+
+# benchmark results
+bench.out
+bench.txt
+*.bench
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Environment / secrets
+# =========================
+.env
+.env.*
+*.local
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/

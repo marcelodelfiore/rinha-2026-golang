@@ -11,27 +11,39 @@ type ExactKNN struct {
 	dataset *dataset.Dataset
 }
 
-func NewExactKNN(dataset *dataset.Dataset) *ExactKNN {
-	return &ExactKNN{dataset: dataset}
-}
-
-func (s *ExactKNN) Search(query vector.Vector, k int) []Neighbor {
-	var best [fixedK]Neighbor
+func (s *ExactKNN) SearchInto(query vector.Vector, out *[fixedK]Neighbor) int {
 	count := 0
 
 	for i := 0; i < s.dataset.Count; i++ {
 		offset := s.dataset.VectorOffset(i)
-		distance := squaredEuclidean(query, s.dataset.Vectors[offset:offset+dataset.VectorDimensions])
+
+		distance := squaredEuclidean(
+			query,
+			s.dataset.Vectors[offset:offset+dataset.VectorDimensions],
+		)
 
 		candidate := Neighbor{
 			Distance: distance,
 			Fraud:    s.dataset.Labels[i],
 		}
 
-		insertFixedNeighbor(&best, &count, candidate)
+		insertFixedNeighbor(out, &count, candidate)
 	}
 
-	return best[:count]
+	return count
+}
+func NewExactKNN(dataset *dataset.Dataset) *ExactKNN {
+	return &ExactKNN{dataset: dataset}
+}
+
+func (s *ExactKNN) Search(query vector.Vector, k int) []Neighbor {
+	var best [fixedK]Neighbor
+	count := s.SearchInto(query, &best)
+
+	result := make([]Neighbor, count)
+	copy(result, best[:count])
+
+	return result
 }
 
 func squaredEuclidean(query vector.Vector, reference []float32) float32 {
