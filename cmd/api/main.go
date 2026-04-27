@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/api"
@@ -59,11 +60,17 @@ func main() {
 		Handler: mux,
 	}
 
-	log.Println("rinha api listening on :9999")
+	go func() {
+		log.Println("pprof listening on :6060")
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
+	log.Println("rinha api listening on :" + port)
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("server failed: %v", err)
 	}
+
 }
 
 func envOrDefault(name, fallback string) string {

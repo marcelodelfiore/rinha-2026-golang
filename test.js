@@ -34,5 +34,5 @@ const params = {
 };
 
 export default function () {
-  http.post('http://localhost:9999/fraud-score', payload, params);
+  http.post('http://localhost:8080/fraud-score', payload, params);
 }
