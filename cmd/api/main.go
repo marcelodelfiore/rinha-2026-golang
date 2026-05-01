@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
+	"runtime"
 
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/api"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/dataset"
@@ -14,6 +14,9 @@ import (
 )
 
 func main() {
+
+	runtime.GOMAXPROCS(1)
+
 	referencesPath := envOrDefault("REFERENCES_PATH", "resources/references.json.gz")
 	normalizationPath := envOrDefault("NORMALIZATION_PATH", "resources/normalization.json")
 	mccRiskPath := envOrDefault("MCC_RISK_PATH", "resources/mcc_risk.json")
@@ -59,11 +62,6 @@ func main() {
 		Addr:    ":" + port,
 		Handler: mux,
 	}
-
-	go func() {
-		log.Println("pprof listening on :6060")
-		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
 
 	log.Println("rinha api listening on :" + port)
 
