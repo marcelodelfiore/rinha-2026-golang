@@ -47,14 +47,29 @@ func (s *ExactKNN) Search(query vector.Vector, k int) []Neighbor {
 }
 
 func squaredEuclidean(query vector.Vector, reference []float32) float32 {
-	var sum float32
 
-	for i := 0; i < dataset.VectorDimensions; i++ {
-		diff := query[i] - reference[i]
-		sum += diff * diff
-	}
+	_ = query[13]
+	_ = reference[13]
 
-	return sum
+	d0 := query[0] - reference[0]
+	d1 := query[1] - reference[1]
+	d2 := query[2] - reference[2]
+	d3 := query[3] - reference[3]
+	d4 := query[4] - reference[4]
+	d5 := query[5] - reference[5]
+	d6 := query[6] - reference[6]
+	d7 := query[7] - reference[7]
+	d8 := query[8] - reference[8]
+	d9 := query[9] - reference[9]
+	d10 := query[10] - reference[10]
+	d11 := query[11] - reference[11]
+	d12 := query[12] - reference[12]
+	d13 := query[13] - reference[13]
+
+	return d0*d0 + d1*d1 + d2*d2 + d3*d3 +
+		d4*d4 + d5*d5 + d6*d6 + d7*d7 +
+		d8*d8 + d9*d9 + d10*d10 + d11*d11 +
+		d12*d12 + d13*d13
 }
 
 func insertFixedNeighbor(best *[fixedK]Neighbor, count *int, candidate Neighbor) {
