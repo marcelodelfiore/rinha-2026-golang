@@ -18,15 +18,6 @@ export const options = {
   ],
 };
 
-const payload = JSON.stringify({
-  id: "tx-1",
-  transaction: { amount: 100.0, installments: 1, requested_at: "2026-03-11T20:23:35Z" },
-  customer: { avg_amount: 80.0, tx_count_24h: 2, known_merchants: ["MERC-001"] },
-  merchant: { id: "MERC-001", mcc: "5411", avg_amount: 60.0 },
-  terminal: { is_online: false, card_present: true, km_from_home: 10.0 },
-  last_transaction: null
-});
-
 const params = {
   headers: {
     'Content-Type': 'application/json',
