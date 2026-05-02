@@ -101,3 +101,30 @@ func sortFixedNeighbors(best *[fixedK]Neighbor, count int) {
 		best[j+1] = current
 	}
 }
+
+func manhattan14(query vector.Vector, reference []float32) float32 {
+	_ = query[13]
+	_ = reference[13]
+
+	var sum float32
+
+	d0 := query[0] - reference[0]
+	if d0 < 0 { d0 = -d0 }
+	sum += d0
+
+	d1 := query[1] - reference[1]
+	if d1 < 0 { d1 = -d1 }
+	sum += d1
+
+	d2 := query[2] - reference[2]
+	if d2 < 0 { d2 = -d2 }
+	sum += d2
+
+	// ... repeat until d13
+
+	d13 := query[13] - reference[13]
+	if d13 < 0 { d13 = -d13 }
+	sum += d13
+
+	return sum
+}
