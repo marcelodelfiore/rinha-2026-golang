@@ -1,0 +1,7 @@
+{
+    "participants": ["Marcelo Del Fiore"],
+    "social": ["https://github.com/marcelodelfiore/", "https://www.linkedin.com/in/marcelo-del-fiore"],
+    "source-code-repo": "https://github.com/100f/rinha-backend-2025",
+    "stack": ["go", "nginx", "docker"],
+    "open_to_work": true
+}
