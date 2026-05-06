@@ -1,6 +1,6 @@
 services:
   api1:
-    build: .
+    image: marcelodelfiore/rinha-2026-golang:latest
     hostname: api1
     environment:
       PORT: 8080
@@ -16,7 +16,7 @@ services:
     mem_limit: 150m
 
   api2:
-    build: .
+    image: marcelodelfiore/rinha-2026-golang:latest
     hostname: api2
     environment:
       PORT: 8080
