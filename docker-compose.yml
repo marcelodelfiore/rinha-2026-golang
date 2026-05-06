@@ -8,10 +8,11 @@ services:
       NORMALIZATION_PATH: resources/normalization.json
       MCC_RISK_PATH: resources/mcc_risk.json
       GOMAXPROCS: 1
+      GOGC: 300
       SEARCH_MODE: ivf
-      IVF_CLUSTERS: 128
-      IVF_PROBES: 8
-    cpus: 0.45
+      IVF_CLUSTERS: 1024
+      IVF_PROBES: 12
+    cpus: 0.25
     mem_limit: 150m
 
   api2:
@@ -23,10 +24,11 @@ services:
       NORMALIZATION_PATH: resources/normalization.json
       MCC_RISK_PATH: resources/mcc_risk.json
       GOMAXPROCS: 1
+      GOGC: 300
       SEARCH_MODE: ivf
-      IVF_CLUSTERS: 128
-      IVF_PROBES: 8
-    cpus: 0.45
+      IVF_CLUSTERS: 1024 
+      IVF_PROBES: 12
+    cpus: 0.25
     mem_limit: 150m
 
   nginx:
@@ -38,5 +40,5 @@ services:
     depends_on:
       - api1
       - api2
-    cpus: 0.10
+    cpus: 0.50
     mem_limit: 50m
