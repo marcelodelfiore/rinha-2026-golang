@@ -1,10 +1,12 @@
-package detection
+package fraud
 
-import "github.com/marcelodelfiore/rinha-2026-golang/internal/search"
-import "github.com/marcelodelfiore/rinha-2026-golang/internal/vector"
+import (
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/search"
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/vector"
+)
 
 const (
-	DefaultK       = 5
+	DefaultK       = search.FixedK
 	ApprovalCutoff = 0.6
 )
 
@@ -25,21 +27,22 @@ func NewEngine(vectorizer Vectorizer, searcher search.Searcher) *Engine {
 }
 
 func (e *Engine) Score(input any) (Result, error) {
-	vector, err := e.vectorizer.Vectorize(input)
+	query, err := e.vectorizer.Vectorize(input)
 	if err != nil {
 		return Result{}, err
 	}
 
-	neighbors := e.searcher.Search(vector, DefaultK)
+	var neighbors [search.FixedK]search.Neighbor
+	count := e.searcher.SearchInto(query, &neighbors)
 
 	fraudCount := 0
-	for _, neighbor := range neighbors {
-		if neighbor.Fraud {
+	for i := 0; i < count; i++ {
+		if neighbors[i].Fraud {
 			fraudCount++
 		}
 	}
 
-	fraudScore := float32(fraudCount) / float32(DefaultK)
+	fraudScore := float32(fraudCount) / float32(count)
 
 	return Result{
 		Approved:   fraudScore < ApprovalCutoff,

@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/marcelodelfiore/rinha-2026-golang/internal/detection"
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/fraud"
 )
 
 type Handler struct {
-	engine *detection.Engine
+	engine *fraud.Engine
 }
 
-func NewHandler(engine *detection.Engine) *Handler {
+func NewHandler(engine *fraud.Engine) *Handler {
 	return &Handler{engine: engine}
 }
 

@@ -1,4 +1,4 @@
-package detection
+package fraud
 
 type Result struct {
 	Approved   bool

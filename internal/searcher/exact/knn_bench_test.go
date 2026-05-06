@@ -1,14 +1,15 @@
-package search
+package exact
 
 import (
 	"math/rand"
 	"testing"
 
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/dataset"
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/search"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/vector"
 )
 
-var sinkBest [fixedK]Neighbor
+var sinkBest [search.FixedK]search.Neighbor
 var sinkCount int
 
 func BenchmarkExactKNN_SearchInto_100k_14d(b *testing.B) {
@@ -33,7 +34,7 @@ func BenchmarkExactKNN_SearchInto_100k_14d(b *testing.B) {
 		query[i] = rand.Float32()
 	}
 
-	var out [fixedK]Neighbor
+	var out [search.FixedK]search.Neighbor
 
 	b.ReportAllocs()
 	b.ResetTimer()

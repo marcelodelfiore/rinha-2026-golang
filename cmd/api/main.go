@@ -8,8 +8,8 @@ import (
 
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/api"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/dataset"
-	"github.com/marcelodelfiore/rinha-2026-golang/internal/detection"
-	"github.com/marcelodelfiore/rinha-2026-golang/internal/search"
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/fraud"
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/config"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/vectorizer"
 )
 
@@ -49,8 +49,12 @@ func main() {
 		mccRisk,
 	)
 
-	searcher := search.NewExactKNN(referenceDataset)
-	engine := detection.NewEngine(v, searcher)
+	searcher, err := config.New(referenceDataset)
+	if err != nil {
+		log.Fatalf("build searcher: %v", err)
+	}
+
+	engine := fraud.NewEngine(v, searcher)
 
 	mux := http.NewServeMux()
 	handler := api.NewHandler(engine)

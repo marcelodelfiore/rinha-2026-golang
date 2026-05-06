@@ -2,11 +2,8 @@ package search
 
 import "github.com/marcelodelfiore/rinha-2026-golang/internal/vector"
 
-type Neighbor struct {
-	Distance float32
-	Fraud    bool
-}
+const FixedK = 5
 
 type Searcher interface {
-	Search(query vector.Vector, k int) []Neighbor
+	SearchInto(query vector.Vector, out *[FixedK]Neighbor) int
 }

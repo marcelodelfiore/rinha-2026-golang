@@ -1,17 +1,16 @@
-package search
+package exact
 
 import (
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/dataset"
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/search"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/vector"
 )
-
-const fixedK = 5
 
 type ExactKNN struct {
 	dataset *dataset.Dataset
 }
 
-func (s *ExactKNN) SearchInto(query vector.Vector, out *[fixedK]Neighbor) int {
+func (s *ExactKNN) SearchInto(query vector.Vector, out *[search.FixedK]search.Neighbor) int {
 	count := 0
 
 	for i := 0; i < s.dataset.Count; i++ {
@@ -22,9 +21,10 @@ func (s *ExactKNN) SearchInto(query vector.Vector, out *[fixedK]Neighbor) int {
 			s.dataset.Vectors[offset:offset+dataset.VectorDimensions],
 		)
 
-		candidate := Neighbor{
+		candidate := search.Neighbor{
 			Distance: distance,
-			Fraud:    s.dataset.Labels[i],
+			Fraud: s.dataset.Labels[i],
+			Index: i,
 		}
 
 		insertFixedNeighbor(out, &count, candidate)
@@ -32,15 +32,16 @@ func (s *ExactKNN) SearchInto(query vector.Vector, out *[fixedK]Neighbor) int {
 
 	return count
 }
+
 func NewExactKNN(dataset *dataset.Dataset) *ExactKNN {
 	return &ExactKNN{dataset: dataset}
 }
 
-func (s *ExactKNN) Search(query vector.Vector, k int) []Neighbor {
-	var best [fixedK]Neighbor
+func (s *ExactKNN) Search(query vector.Vector, k int) []search.Neighbor {
+	var best [search.FixedK]search.Neighbor
 	count := s.SearchInto(query, &best)
 
-	result := make([]Neighbor, count)
+	result := make([]search.Neighbor, count)
 	copy(result, best[:count])
 
 	return result
@@ -72,23 +73,23 @@ func squaredEuclidean(query vector.Vector, reference []float32) float32 {
 		d12*d12 + d13*d13
 }
 
-func insertFixedNeighbor(best *[fixedK]Neighbor, count *int, candidate Neighbor) {
-	if *count < fixedK {
+func insertFixedNeighbor(best *[search.FixedK]search.Neighbor, count *int, candidate search.Neighbor) {
+	if *count < search.FixedK {
 		best[*count] = candidate
 		*count++
 		sortFixedNeighbors(best, *count)
 		return
 	}
 
-	if candidate.Distance >= best[fixedK-1].Distance {
+	if candidate.Distance >= best[search.FixedK-1].Distance {
 		return
 	}
 
-	best[fixedK-1] = candidate
-	sortFixedNeighbors(best, fixedK)
+	best[search.FixedK-1] = candidate
+	sortFixedNeighbors(best, search.FixedK)
 }
 
-func sortFixedNeighbors(best *[fixedK]Neighbor, count int) {
+func sortFixedNeighbors(best *[search.FixedK]search.Neighbor, count int) {
 	for i := 1; i < count; i++ {
 		current := best[i]
 		j := i - 1
