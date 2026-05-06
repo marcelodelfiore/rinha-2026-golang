@@ -8,13 +8,16 @@ import (
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/vector"
 )
 
+const maxClusters = 2048
+
 type centroidCandidate struct {
 	index    int
 	distance float32
 }
 
 func (idx *Index) SearchInto(query vector.Vector, out *[search.FixedK]search.Neighbor) int {
-	var probeCandidates [256]centroidCandidate
+	var probeCandidates [maxClusters]centroidCandidate
+	candidates := 0
 
 	if idx.clusters > len(probeCandidates) {
 		return 0
@@ -36,6 +39,7 @@ func (idx *Index) SearchInto(query vector.Vector, out *[search.FixedK]search.Nei
 		list := idx.lists[cluster]
 
 		for _, vectorIndex := range list {
+			candidates++
 			offset := idx.dataset.VectorOffset(vectorIndex)
 
 			distance := squaredEuclideanVector(
@@ -58,7 +62,7 @@ func (idx *Index) SearchInto(query vector.Vector, out *[search.FixedK]search.Nei
 
 func (idx *Index) selectProbeCentroids(
 	query vector.Vector,
-	out *[256]centroidCandidate,
+	out *[maxClusters]centroidCandidate,
 ) int {
 	count := 0
 
@@ -103,7 +107,7 @@ func (idx *Index) nearestCentroid(v []float32) int {
 }
 
 func insertCentroidCandidate(
-	out *[256]centroidCandidate,
+	out *[maxClusters]centroidCandidate,
 	count *int,
 	limit int,
 	candidate centroidCandidate,

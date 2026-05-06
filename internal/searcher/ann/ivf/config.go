@@ -7,7 +7,7 @@ type Config struct {
 
 func DefaultConfig() Config {
 	return Config{
-		Clusters: 128,
-		Probes:   8,
+		Clusters: 1024,
+		Probes:   16,
 	}
 }
