@@ -17,7 +17,6 @@ type centroidCandidate struct {
 
 func (idx *Index) SearchInto(query vector.Vector, out *[search.FixedK]search.Neighbor) int {
 	var probeCandidates [maxClusters]centroidCandidate
-	candidates := 0
 
 	if idx.clusters > len(probeCandidates) {
 		return 0
@@ -39,7 +38,6 @@ func (idx *Index) SearchInto(query vector.Vector, out *[search.FixedK]search.Nei
 		list := idx.lists[cluster]
 
 		for _, vectorIndex := range list {
-			candidates++
 			offset := idx.dataset.VectorOffset(vectorIndex)
 
 			distance := squaredEuclideanVector(
