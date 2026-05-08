@@ -2,6 +2,7 @@ package ivf
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/dataset"
 )
@@ -73,6 +74,10 @@ func (idx *Index) assignVectors() {
 }
 
 func (idx *Index) logClusterStats() {
+	if os.Getenv("IVF_LOG_CLUSTER_STATS") != "1" {
+		return
+	}
+
 	min := idx.dataset.Count
 	max := 0
 	total := 0
