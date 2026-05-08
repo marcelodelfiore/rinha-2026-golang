@@ -34,6 +34,7 @@ func New(ds *dataset.Dataset, cfg Config) (*Index, error) {
 
 	idx.initializeCentroids()
 	idx.assignVectors()
+	idx.buildClusterData()
 	idx.logClusterStats()
 
 	return idx, nil
@@ -70,6 +71,30 @@ func (idx *Index) assignVectors() {
 		)
 
 		idx.lists[cluster] = append(idx.lists[cluster], i)
+	}
+}
+
+func (idx *Index) buildClusterData() {
+	idx.clusterData = make([]Cluster, idx.clusters)
+
+	for clusterIndex, list := range idx.lists {
+		cluster := Cluster{
+			Vectors: make([]float32, 0, len(list)*dataset.VectorDimensions),
+			Labels:  make([]bool, 0, len(list)),
+		}
+
+		for _, vectorIndex := range list {
+			offset := idx.dataset.VectorOffset(vectorIndex)
+
+			cluster.Vectors = append(
+				cluster.Vectors,
+				idx.dataset.Vectors[offset:offset+dataset.VectorDimensions]...,
+			)
+
+			cluster.Labels = append(cluster.Labels, idx.dataset.Labels[vectorIndex])
+		}
+
+		idx.clusterData[clusterIndex] = cluster
 	}
 }
 

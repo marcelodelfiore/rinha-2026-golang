@@ -34,27 +34,28 @@ func (idx *Index) SearchInto(query vector.Vector, out *[search.FixedK]search.Nei
 	count := 0
 
 	for p := 0; p < probeCount; p++ {
-		cluster := probeCandidates[p].index
-		list := idx.lists[cluster]
+		clusterIndex := probeCandidates[p].index
+		cluster := idx.clusterData[clusterIndex]
 
-		for _, vectorIndex := range list {
-			offset := idx.dataset.VectorOffset(vectorIndex)
+		labelIndex := 0
 
+		for offset := 0; offset < len(cluster.Vectors); offset += dataset.VectorDimensions {
 			distance := squaredEuclideanVector(
 				query,
-				idx.dataset.Vectors[offset:offset+dataset.VectorDimensions],
+				cluster.Vectors[offset:offset+dataset.VectorDimensions],
 			)
 
 			candidate := search.Neighbor{
 				Distance: distance,
-				Fraud:    idx.dataset.Labels[vectorIndex],
-				Index:    vectorIndex,
+				Fraud:    cluster.Labels[labelIndex],
+				Index:    -1,
 			}
 
 			insertFixedNeighbor(out, &count, candidate)
+
+			labelIndex++
 		}
 	}
-
 	return count
 }
 
