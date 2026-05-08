@@ -165,3 +165,82 @@ func benchmarkQuery(ds *dataset.Dataset) vector.Vector {
 
 	return query
 }
+
+func BenchmarkInsertFixedNeighbor(b *testing.B) {
+	var neighbors [search.FixedK]search.Neighbor
+
+	candidates := [...]search.Neighbor{
+		{Distance: 0.90, Fraud: false, Index: 0},
+		{Distance: 0.10, Fraud: true, Index: 1},
+		{Distance: 0.70, Fraud: false, Index: 2},
+		{Distance: 0.20, Fraud: true, Index: 3},
+		{Distance: 0.50, Fraud: false, Index: 4},
+		{Distance: 0.30, Fraud: true, Index: 5},
+		{Distance: 0.80, Fraud: false, Index: 6},
+		{Distance: 0.40, Fraud: true, Index: 7},
+		{Distance: 0.60, Fraud: false, Index: 8},
+		{Distance: 0.05, Fraud: true, Index: 9},
+	}
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		count := 0
+
+		for _, candidate := range candidates {
+			insertFixedNeighbor(&neighbors, &count, candidate)
+		}
+	}
+}
+
+func TestInsertFixedNeighborKeepsBestFive(t *testing.T) {
+	var neighbors [search.FixedK]search.Neighbor
+	count := 0
+
+	candidates := []search.Neighbor{
+		{Distance: 0.90, Fraud: false, Index: 0},
+		{Distance: 0.10, Fraud: true, Index: 1},
+		{Distance: 0.70, Fraud: false, Index: 2},
+		{Distance: 0.20, Fraud: true, Index: 3},
+		{Distance: 0.50, Fraud: false, Index: 4},
+		{Distance: 0.30, Fraud: true, Index: 5},
+		{Distance: 0.80, Fraud: false, Index: 6},
+		{Distance: 0.40, Fraud: true, Index: 7},
+		{Distance: 0.60, Fraud: false, Index: 8},
+		{Distance: 0.05, Fraud: true, Index: 9},
+	}
+
+	for _, candidate := range candidates {
+		insertFixedNeighbor(&neighbors, &count, candidate)
+	}
+
+	if count != search.FixedK {
+		t.Fatalf("expected count %d, got %d", search.FixedK, count)
+	}
+
+	maxSelectedDistance := neighbors[0].Distance
+	for i := 1; i < count; i++ {
+		if neighbors[i].Distance > maxSelectedDistance {
+			maxSelectedDistance = neighbors[i].Distance
+		}
+	}
+
+	if maxSelectedDistance != 0.40 {
+		t.Fatalf("expected worst selected distance 0.40, got %f", maxSelectedDistance)
+	}
+
+	expectedIndexes := map[int]bool{
+		1: true, // 0.10
+		3: true, // 0.20
+		5: true, // 0.30
+		7: true, // 0.40
+		9: true, // 0.05
+	}
+
+	for i := 0; i < count; i++ {
+		if !expectedIndexes[neighbors[i].Index] {
+			t.Fatalf("unexpected selected neighbor: index=%d distance=%f", neighbors[i].Index, neighbors[i].Distance)
+		}
+	}
+}
