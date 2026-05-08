@@ -11,7 +11,7 @@ services:
       GOGC: 300
       SEARCH_MODE: ivf
       IVF_CLUSTERS: 1024
-      IVF_PROBES: 16
+      IVF_PROBES: 24
     cpus: 0.25
     mem_limit: 150m
     cpuset: "0"
@@ -28,7 +28,7 @@ services:
       GOGC: 300
       SEARCH_MODE: ivf
       IVF_CLUSTERS: 1024
-      IVF_PROBES: 16
+      IVF_PROBES: 24
     cpus: 0.25
     mem_limit: 150m
     cpuset: "1"
