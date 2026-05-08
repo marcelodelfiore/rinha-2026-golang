@@ -14,7 +14,6 @@ services:
       IVF_PROBES: 24
     cpus: 0.25
     mem_limit: 150m
-    cpuset: "0"
 
   api2:
     image: marcelodelfiore/rinha-2026-golang:latest
@@ -31,7 +30,6 @@ services:
       IVF_PROBES: 24
     cpus: 0.25
     mem_limit: 150m
-    cpuset: "1"
 
   nginx:
     image: nginx:1.27-alpine
@@ -44,4 +42,3 @@ services:
       - api2
     cpus: 0.50
     mem_limit: 50m
-    cpuset: "2"
