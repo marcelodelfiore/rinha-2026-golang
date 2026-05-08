@@ -48,7 +48,7 @@ func (idx *Index) SearchInto(query vector.Vector, out *[search.FixedK]search.Nei
 			candidate := search.Neighbor{
 				Distance: distance,
 				Fraud:    cluster.Labels[labelIndex],
-				Index:    -1,
+				Index:    cluster.Indexes[labelIndex],
 			}
 
 			insertFixedNeighbor(out, &count, candidate)

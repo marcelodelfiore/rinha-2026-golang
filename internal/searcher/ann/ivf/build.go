@@ -81,6 +81,7 @@ func (idx *Index) buildClusterData() {
 		cluster := Cluster{
 			Vectors: make([]float32, 0, len(list)*dataset.VectorDimensions),
 			Labels:  make([]bool, 0, len(list)),
+			Indexes: make([]int, 0, len(list)),
 		}
 
 		for _, vectorIndex := range list {
@@ -92,6 +93,7 @@ func (idx *Index) buildClusterData() {
 			)
 
 			cluster.Labels = append(cluster.Labels, idx.dataset.Labels[vectorIndex])
+			cluster.Indexes = append(cluster.Indexes, vectorIndex)
 		}
 
 		idx.clusterData[clusterIndex] = cluster

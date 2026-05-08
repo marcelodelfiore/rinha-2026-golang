@@ -7,6 +7,7 @@ import (
 type Cluster struct {
 	Vectors []float32
 	Labels  []bool
+	Indexes []int
 }
 
 type Index struct {
