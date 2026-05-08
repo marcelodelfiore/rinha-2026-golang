@@ -64,6 +64,7 @@ func (idx *Index) selectProbeCentroids(
 	out *[maxClusters]centroidCandidate,
 ) int {
 	count := 0
+	worstIndex := 0
 
 	for c := 0; c < idx.clusters; c++ {
 		offset := c * dataset.VectorDimensions
@@ -78,7 +79,23 @@ func (idx *Index) selectProbeCentroids(
 			distance: distance,
 		}
 
-		insertCentroidCandidate(out, &count, idx.probes, candidate)
+		if count < idx.probes {
+			out[count] = candidate
+
+			if count == 0 || candidate.distance > out[worstIndex].distance {
+				worstIndex = count
+			}
+
+			count++
+			continue
+		}
+
+		if candidate.distance >= out[worstIndex].distance {
+			continue
+		}
+
+		out[worstIndex] = candidate
+		worstIndex = worstCentroidCandidateIndex(out, count)
 	}
 
 	return count
@@ -210,4 +227,21 @@ func squaredEuclideanVector(query vector.Vector, reference []float32) float32 {
 		d4*d4 + d5*d5 + d6*d6 + d7*d7 +
 		d8*d8 + d9*d9 + d10*d10 + d11*d11 +
 		d12*d12 + d13*d13
+}
+
+func worstCentroidCandidateIndex(
+	out *[maxClusters]centroidCandidate,
+	count int,
+) int {
+	worstIndex := 0
+	worstDistance := out[0].distance
+
+	for i := 1; i < count; i++ {
+		if out[i].distance > worstDistance {
+			worstDistance = out[i].distance
+			worstIndex = i
+		}
+	}
+
+	return worstIndex
 }
