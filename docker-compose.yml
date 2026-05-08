@@ -10,8 +10,8 @@ services:
       GOMAXPROCS: 1
       GOGC: 300
       SEARCH_MODE: ivf
-      IVF_CLUSTERS: 1024
-      IVF_PROBES: 24
+      IVF_CLUSTERS: 768
+      IVF_PROBES: 16
     cpus: 0.25
     mem_limit: 150m
 
@@ -26,8 +26,8 @@ services:
       GOMAXPROCS: 1
       GOGC: 300
       SEARCH_MODE: ivf
-      IVF_CLUSTERS: 1024
-      IVF_PROBES: 24
+      IVF_CLUSTERS: 768
+      IVF_PROBES: 16
     cpus: 0.25
     mem_limit: 150m
 
