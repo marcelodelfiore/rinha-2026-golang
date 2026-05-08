@@ -11,10 +11,9 @@ services:
       GOGC: 300
       SEARCH_MODE: ivf
       IVF_CLUSTERS: 1024
-      IVF_PROBES: 16
+      IVF_PROBES: 24
     cpus: 0.25
     mem_limit: 150m
-    cpuset: "0"
 
   api2:
     build: .
@@ -28,10 +27,9 @@ services:
       GOGC: 300
       SEARCH_MODE: ivf
       IVF_CLUSTERS: 1024
-      IVF_PROBES: 16
+      IVF_PROBES: 24
     cpus: 0.25
     mem_limit: 150m
-    cpuset: "1"
 
   nginx:
     image: nginx:1.27-alpine
@@ -42,6 +40,5 @@ services:
     depends_on:
       - api1
       - api2
-    cpus: 0.50
+    cpus: 0.5
     mem_limit: 50m
-    cpuset: "2"
