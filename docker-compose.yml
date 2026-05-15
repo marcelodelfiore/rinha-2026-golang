@@ -16,22 +16,22 @@ services:
     cpus: 0.25
     mem_limit: 150m
 
-  api2:
-    build: .
-    hostname: api2
-    environment:
-      PORT: 8080
-      REFERENCES_PATH: resources/references.json.gz
-      NORMALIZATION_PATH: resources/normalization.json
-      MCC_RISK_PATH: resources/mcc_risk.json
-      GOMAXPROCS: 1
-      GOGC: 300
-      SEARCH_MODE: ivf
-      IVF_CLUSTERS: 1024
-      IVF_PROBES: 16
-      FRAUD_REJECT_VOTES: 2
-    cpus: 0.25
-    mem_limit: 150m
+  # api2:
+  #   build: .
+  #   hostname: api2
+  #   environment:
+  #     PORT: 8080
+  #     REFERENCES_PATH: resources/references.json.gz
+  #     NORMALIZATION_PATH: resources/normalization.json
+  #     MCC_RISK_PATH: resources/mcc_risk.json
+  #     GOMAXPROCS: 1
+  #     GOGC: 300
+  #     SEARCH_MODE: ivf
+  #     IVF_CLUSTERS: 1024
+  #     IVF_PROBES: 16
+  #     FRAUD_REJECT_VOTES: 2
+  #   cpus: 0.25
+  #   mem_limit: 150m
 
   nginx:
     image: nginx:1.27-alpine
@@ -41,6 +41,6 @@ services:
       - "9999:9999"
     depends_on:
       - api1
-      - api2
+      # - api2
     cpus: 0.5
     mem_limit: 50m
