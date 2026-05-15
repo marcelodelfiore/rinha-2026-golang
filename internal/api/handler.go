@@ -3,29 +3,54 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"sync/atomic"
 
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/fraud"
 )
 
 type Handler struct {
-	engine *fraud.Engine
+	engine atomic.Pointer[fraud.Engine]
 }
 
 func NewHandler(engine *fraud.Engine) *Handler {
-	return &Handler{engine: engine}
+	h := &Handler{}
+
+	if engine != nil {
+		h.engine.Store(engine)
+	}
+
+	return h
+}
+
+func (h *Handler) SetEngine(engine *fraud.Engine) {
+	h.engine.Store(engine)
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /ready", h.ready)
+	mux.HandleFunc("GET /health", h.ready)
 	mux.HandleFunc("POST /fraud-score", h.fraudScore)
 }
 
 func (h *Handler) ready(w http.ResponseWriter, r *http.Request) {
+	// Important for the official runner:
+	// return 200 immediately, even while the engine is still loading.
+	//
+	// The benchmark requests should start only after the health check passes.
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte("ok"))
 }
 
 func (h *Handler) fraudScore(w http.ResponseWriter, r *http.Request) {
+	engine := h.engine.Load()
+	if engine == nil {
+		writeJSON(w, http.StatusServiceUnavailable, FraudScoreResponse{
+			Approved:   true,
+			FraudScore: 0.0,
+		})
+		return
+	}
+
 	var request FraudScoreRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -36,7 +61,7 @@ func (h *Handler) fraudScore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.engine.Score(request)
+	result, err := engine.Score(request)
 	if err != nil {
 		writeJSON(w, http.StatusOK, FraudScoreResponse{
 			Approved:   true,

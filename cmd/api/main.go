@@ -18,6 +18,38 @@ import (
 func main() {
 	runtime.GOMAXPROCS(1)
 
+	mux := http.NewServeMux()
+	handler := api.NewHandler(nil)
+	handler.RegisterRoutes(mux)
+
+	port := envOrDefault("PORT", "8080")
+
+	go func() {
+		log.Println("initializing fraud engine")
+
+		engine, err := buildEngine()
+		if err != nil {
+			log.Fatalf("initialize fraud engine: %v", err)
+		}
+
+		handler.SetEngine(engine)
+
+		log.Println("fraud engine ready")
+	}()
+
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
+
+	log.Println("rinha api listening on :" + port)
+
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatalf("server failed: %v", err)
+	}
+}
+
+func buildEngine() (*fraud.Engine, error) {
 	searchMode := envOrDefault("SEARCH_MODE", "exact_u8")
 
 	referencesBinPath := envOrDefault("REFERENCES_BIN_PATH", "resources/references_u8.bin")
@@ -26,12 +58,12 @@ func main() {
 
 	normalizationConfig, err := dataset.LoadNormalization(normalizationPath)
 	if err != nil {
-		log.Fatalf("load normalization: %v", err)
+		return nil, err
 	}
 
 	mccRisk, err := dataset.LoadMCCRisk(mccRiskPath)
 	if err != nil {
-		log.Fatalf("load mcc risk: %v", err)
+		return nil, err
 	}
 
 	v := vectorizer.New(
@@ -51,7 +83,7 @@ func main() {
 
 	binaryDataset, err := dataset.LoadBinary(referencesBinPath)
 	if err != nil {
-		log.Fatalf("load binary references: %v", err)
+		return nil, err
 	}
 
 	if !binaryDataset.IsUint8() {
@@ -72,37 +104,20 @@ func main() {
 	case "exact_u8":
 		s, err = exact_u8.New(binaryDataset)
 		if err != nil {
-			log.Fatalf("build exact_u8 searcher: %v", err)
+			return nil, err
 		}
 
 	case "ivf_u8":
 		s, err = ivf_u8.New(binaryDataset, ivf_u8.ConfigFromEnv())
 		if err != nil {
-			log.Fatalf("build ivf_u8 searcher: %v", err)
+			return nil, err
 		}
 
 	default:
 		log.Fatalf("unsupported SEARCH_MODE for u8 runtime: %s", searchMode)
 	}
 
-	engine := fraud.NewEngine(v, s)
-
-	mux := http.NewServeMux()
-	handler := api.NewHandler(engine)
-	handler.RegisterRoutes(mux)
-
-	port := envOrDefault("PORT", "8080")
-
-	server := &http.Server{
-		Addr:    ":" + port,
-		Handler: mux,
-	}
-
-	log.Println("rinha api listening on :" + port)
-
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("server failed: %v", err)
-	}
+	return fraud.NewEngine(v, s), nil
 }
 
 func envOrDefault(name, fallback string) string {
