@@ -15,6 +15,7 @@ WORKDIR /app
 
 COPY --from=build /bin/rinha-api /bin/rinha-api
 COPY resources ./resources
+COPY resources/references_u8.bin resources/references_u8.bin
 
 ENV PORT=8080
 

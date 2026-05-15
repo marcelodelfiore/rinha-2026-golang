@@ -13,6 +13,7 @@ services:
       IVF_CLUSTERS: 1024
       IVF_PROBES: 16
       FRAUD_REJECT_VOTES: 2
+      REFERENCES_BIN_PATH: resources/references_u8.bin
     cpus: 0.25
     mem_limit: 150m
 
