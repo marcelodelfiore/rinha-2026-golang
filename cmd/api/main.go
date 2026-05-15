@@ -10,6 +10,7 @@ import (
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/dataset"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/fraud"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/search"
+	"github.com/marcelodelfiore/rinha-2026-golang/internal/searcher/ann/ivf_u8"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/searcher/exact_u8"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/vectorizer"
 )
@@ -72,6 +73,12 @@ func main() {
 		s, err = exact_u8.New(binaryDataset)
 		if err != nil {
 			log.Fatalf("build exact_u8 searcher: %v", err)
+		}
+
+	case "ivf_u8":
+		s, err = ivf_u8.New(binaryDataset, ivf_u8.ConfigFromEnv())
+		if err != nil {
+			log.Fatalf("build ivf_u8 searcher: %v", err)
 		}
 
 	default:
