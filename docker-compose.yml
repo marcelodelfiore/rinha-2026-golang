@@ -9,10 +9,11 @@ services:
       MCC_RISK_PATH: resources/mcc_risk.json
       GOMAXPROCS: 1
       GOGC: 300
-      SEARCH_MODE: ivf
-      IVF_CLUSTERS: 1024
-      IVF_PROBES: 16
+      SEARCH_MODE: ivf_u8
+      IVF_CLUSTERS: 8192
+      IVF_PROBES: 4
       FRAUD_REJECT_VOTES: 2
+      REFERENCES_BIN_PATH: resources/references_u8.bin
     cpus: 0.25
     mem_limit: 150m
 
@@ -26,10 +27,11 @@ services:
       MCC_RISK_PATH: resources/mcc_risk.json
       GOMAXPROCS: 1
       GOGC: 300
-      SEARCH_MODE: ivf
-      IVF_CLUSTERS: 1024
-      IVF_PROBES: 16
+      SEARCH_MODE: ivf_u8
+      IVF_CLUSTERS: 8192
+      IVF_PROBES: 4 
       FRAUD_REJECT_VOTES: 2
+      REFERENCES_BIN_PATH: resources/references_u8.bin
     cpus: 0.25
     mem_limit: 150m
 
