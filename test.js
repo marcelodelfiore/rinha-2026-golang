@@ -1,4 +1,11 @@
 import http from 'k6/http';
+import { check } from 'k6';
+import { Counter } from 'k6/metrics';
+
+export const status2xx = new Counter('status_2xx');
+export const status4xx = new Counter('status_4xx');
+export const status5xx = new Counter('status_5xx');
+export const statusOther = new Counter('status_other');
 
 export const options = {
   scenarios: {
@@ -54,5 +61,19 @@ export default function () {
     last_transaction: null,
   });
 
-  http.post('http://localhost:9999/fraud-score', payload, params);
+  const res = http.post('http://localhost:9999/fraud-score', payload, params);
+
+  if (res.status >= 200 && res.status < 300) {
+    status2xx.add(1);
+  } else if (res.status >= 400 && res.status < 500) {
+    status4xx.add(1);
+  } else if (res.status >= 500 && res.status < 600) {
+    status5xx.add(1);
+  } else {
+    statusOther.add(1);
+  }
+
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+  });
 }
