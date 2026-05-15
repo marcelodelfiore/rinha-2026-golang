@@ -1,7 +1,7 @@
 package search
 
 type Neighbor struct {
-	Distance float32
+	Distance int
 	Fraud    bool
 	Index    int
 }

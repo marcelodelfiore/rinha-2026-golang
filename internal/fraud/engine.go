@@ -27,13 +27,23 @@ func NewEngine(vectorizer Vectorizer, searcher search.Searcher) *Engine {
 }
 
 func (e *Engine) Score(input any) (Result, error) {
-	query, err := e.vectorizer.Vectorize(input)
+	queryF32, err := e.vectorizer.Vectorize(input)
 	if err != nil {
 		return Result{}, err
 	}
 
+	var queryU8 [14]uint8
+	vector.QuantizeToUint8(queryF32, queryU8[:])
+
 	var neighbors [search.FixedK]search.Neighbor
-	count := e.searcher.SearchInto(query, &neighbors)
+	count := e.searcher.SearchInto(queryU8[:], &neighbors)
+
+	if count == 0 {
+		return Result{
+			Approved:   true,
+			FraudScore: 0,
+		}, nil
+	}
 
 	fraudCount := 0
 	for i := 0; i < count; i++ {

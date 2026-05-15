@@ -58,7 +58,7 @@ func (s *Searcher) SearchInto(query search.VectorU8, out *[search.FixedK]search.
 		out[i] = search.Neighbor{
 			Index:    -1,
 			Distance: math.MaxInt,
-			Label:    0,
+			Fraud:    false,
 		}
 	}
 
@@ -78,7 +78,7 @@ func (s *Searcher) SearchInto(query search.VectorU8, out *[search.FixedK]search.
 		out[worstPos] = search.Neighbor{
 			Index:    i,
 			Distance: distance,
-			Label:    s.labels[i],
+			Fraud:    s.labels[i] == 1,
 		}
 
 		worstPos, worstDistance = findWorst(out)
