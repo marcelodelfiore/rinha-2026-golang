@@ -28,16 +28,16 @@ func (h *Handler) SetEngine(engine *fraud.Engine) {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /ready", h.ready)
-	mux.HandleFunc("GET /health", h.ready)
 	mux.HandleFunc("POST /fraud-score", h.fraudScore)
-	mux.HandleFunc("GET /", h.ready)
 }
 
 func (h *Handler) ready(w http.ResponseWriter, r *http.Request) {
-	// Important for the official runner:
-	// return 200 immediately, even while the engine is still loading.
-	//
-	// The benchmark requests should start only after the health check passes.
+	if h.engine.Load() == nil {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = w.Write([]byte("not ready"))
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write([]byte("ok"))
 }
