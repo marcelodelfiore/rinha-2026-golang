@@ -1,6 +1,6 @@
 services:
   api1:
-    image: marcelodelfiore/rinha-2026-golang:latest
+    image: marcelodelfiore/rinha-2026-golang:ivf-u8-8192-4-ready
     hostname: api1
     environment:
       PORT: 8080
@@ -18,7 +18,7 @@ services:
     mem_limit: 150m
 
   api2:
-    image: marcelodelfiore/rinha-2026-golang:latest
+    image: marcelodelfiore/rinha-2026-golang:ivf-u8-8192-4-ready
     hostname: api2
     environment:
       PORT: 8080
