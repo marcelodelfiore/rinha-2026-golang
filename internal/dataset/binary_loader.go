@@ -91,18 +91,46 @@ func loadFloat32Dataset(r io.Reader, count, dims int, format uint32) (*Reference
 }
 
 func loadUint8Dataset(r io.Reader, count, dims int, format uint32) (*ReferenceDataset, error) {
+	recordSize := dims + 1
+
 	vectors := make([]uint8, count*dims)
 	labels := make([]uint8, count)
 
-	for i := 0; i < count; i++ {
-		offset := i * dims
+	const recordsPerChunk = 8192
 
-		if _, err := io.ReadFull(r, vectors[offset:offset+dims]); err != nil {
-			return nil, fmt.Errorf("read uint8 vector[%d]: %w", i, err)
+	chunkRecords := recordsPerChunk
+	if count < chunkRecords {
+		chunkRecords = count
+	}
+
+	buffer := make([]uint8, chunkRecords*recordSize)
+
+	for start := 0; start < count; start += chunkRecords {
+		end := start + chunkRecords
+		if end > count {
+			end = count
 		}
 
-		if _, err := io.ReadFull(r, labels[i:i+1]); err != nil {
-			return nil, fmt.Errorf("read label[%d]: %w", i, err)
+		currentRecords := end - start
+		currentBytes := currentRecords * recordSize
+		chunk := buffer[:currentBytes]
+
+		if _, err := io.ReadFull(r, chunk); err != nil {
+			return nil, fmt.Errorf("read uint8 chunk starting at record %d: %w", start, err)
+		}
+
+		for i := 0; i < currentRecords; i++ {
+			globalIndex := start + i
+
+			srcOffset := i * recordSize
+			dstOffset := globalIndex * dims
+
+			copy(
+				vectors[dstOffset:dstOffset+dims],
+				chunk[srcOffset:srcOffset+dims],
+			)
+
+			labels[globalIndex] = chunk[srcOffset+dims]
 		}
 	}
 

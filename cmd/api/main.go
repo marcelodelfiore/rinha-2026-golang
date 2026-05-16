@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/api"
 	"github.com/marcelodelfiore/rinha-2026-golang/internal/dataset"
@@ -81,10 +82,14 @@ func buildEngine() (*fraud.Engine, error) {
 
 	log.Printf("loading uint8 binary references from %s", referencesBinPath)
 
+	loadStart := time.Now()
+
 	binaryDataset, err := dataset.LoadBinary(referencesBinPath)
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("loaded binary references in %s", time.Since(loadStart))
 
 	if !binaryDataset.IsUint8() {
 		log.Fatalf("expected uint8 binary dataset, got format=%d", binaryDataset.Format)
@@ -108,10 +113,13 @@ func buildEngine() (*fraud.Engine, error) {
 		}
 
 	case "ivf_u8":
+		indexStart := time.Now()
+
 		s, err = ivf_u8.New(binaryDataset, ivf_u8.ConfigFromEnv())
 		if err != nil {
 			return nil, err
 		}
+		log.Printf("built search index in %s", time.Since(indexStart))
 
 	default:
 		log.Fatalf("unsupported SEARCH_MODE for u8 runtime: %s", searchMode)
