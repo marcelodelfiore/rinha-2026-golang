@@ -1,6 +1,6 @@
 services:
   api1:
-    image: marcelodelfiore/rinha-2026-golang:ivf-u8-8192-4-fastload
+    image: marcelodelfiore/rinha-2026-golang:ivf-u8-8192-5
     hostname: api1
     environment:
       PORT: 8080
@@ -11,14 +11,14 @@ services:
       GOGC: 300
       SEARCH_MODE: ivf_u8
       IVF_CLUSTERS: 8192
-      IVF_PROBES: 4
+      IVF_PROBES: 5
       FRAUD_REJECT_VOTES: 2
       REFERENCES_BIN_PATH: resources/references_u8.bin
     cpus: 0.25
     mem_limit: 150m
 
   api2:
-    image: marcelodelfiore/rinha-2026-golang:ivf-u8-8192-4-fastload
+    image: marcelodelfiore/rinha-2026-golang:ivf-u8-8192-5
     hostname: api2
     environment:
       PORT: 8080
@@ -29,7 +29,7 @@ services:
       GOGC: 300
       SEARCH_MODE: ivf_u8
       IVF_CLUSTERS: 8192
-      IVF_PROBES: 4 
+      IVF_PROBES: 5 
       FRAUD_REJECT_VOTES: 2
       REFERENCES_BIN_PATH: resources/references_u8.bin
     cpus: 0.25
